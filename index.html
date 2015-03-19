@@ -1,7 +1,9 @@
+
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>what what game</title>
+<script src="http://yanchangyou.github.io/helloworld-web/feature/cookie/cookie.js"></script>
 <style>
 body {
 	
@@ -110,7 +112,7 @@ body {
 	font-weight: 900;
 	padding-bottom: 15px;
 }
-#click-mode,#car-eva {
+#click-mode,#eva {
 	width: 82px;
 }
 .selected {
@@ -122,7 +124,7 @@ body {
 	
 	<div id="container">
 		<div class="title">
-			<div>v0.3.1</div>
+			<div>v0.3.4</div>
 		</div>
 		<!--<div><h1>升级中，待会儿见。。。</h1></div>-->
 		<!--<div><h1>维修中，晚上见。。。</h1></div>-->
@@ -131,8 +133,8 @@ body {
 			<iframe width='100%' frameborder="no" height='100%' id="video-iframe" src=''></iframe>
 		</div>
 		<div class="select-container car-select">
-			<div class="select-option selected" onclick="selectCar(this, 'car-eva');" id="car-adam">亚当</div>
-			<div class="select-option" onclick="selectCar(this, 'car-adam');"id="car-eva">夏娃</div>
+			<div class="select-option selected" onclick="selectCar(this, 'eva');" id="adam">亚当</div>
+			<div class="select-option" onclick="selectCar(this, 'adam');"id="eva">夏娃</div>
 		</div>
 		<div class="control">
 			<div class="col" id="left">
@@ -161,55 +163,36 @@ body {
 	<iframe src="" id="commandIframe" name="commandIframe" style="display:none;"></iframe>
 
 	<script>
-		function flashChecker()
-		{
-			var hasFlash=0;         //是否安装了flash
-			var flashVersion=0; //flash版本
-			var isIE=/*@cc_on!@*/0;      //是否IE浏览器
-			
-			if(isIE)
-			{
-				var swf = new ActiveXObject('ShockwaveFlash.ShockwaveFlash'); 
-				if(swf) {
-					hasFlash=1;
-					VSwf=swf.GetVariable("$version");
-					flashVersion=parseInt(VSwf.split(" ")[1].split(",")[0]); 
-				}
-			}else{
-				if (navigator.plugins && navigator.plugins.length > 0)
-				{
-					var swf=navigator.plugins["Shockwave Flash"];
-					if (swf)
-					{
-						hasFlash=1;
-					        var words = swf.description.split(" ");
-					        for (var i = 0; i < words.length; ++i)
-						{
-					            if (isNaN(parseInt(words[i]))) continue;
-					            flashVersion = parseInt(words[i]);
-						}
-					}
-				}
-			}
-			return {f:hasFlash,v:flashVersion};
-		}
-		
-		var fls=flashChecker();
-		
+		var os = (navigator.platform == "Win32") || (navigator.platform == "Windows") ? "windows" : "other"; 
 	</script>
 
 	<script>
-	
-		var car_server_map = [];
-		car_server_map["car-adam"] = "http://api.whatwhatgame.com:18888";
-		car_server_map["car-eva"] = "http://api.whatwhatgame.com:18889";
+		//所有配置信息
+		var car_config = [];
+		
+		car_config["command"] = [];//命令服务器
+		car_config["video"] = [];//视频
+		
+		car_config["command"]["adam"] = "http://api.whatwhatgame.com:18889";
+		car_config["command"]["eva"] = "http://api.whatwhatgame.com:18888";
+		
+		car_config["video"]["adam"] = [[],[]];
+		car_config["video"]["eva"] = [[],[]];
+		
+		car_config["video"]["adam"]["windows"] = "http://whatwhatgame.com/video/?car=adam";
+		car_config["video"]["adam"]["other"] = "http://whatwhatgame.com/video/html5/?car=adam";
+		car_config["video"]["eva"]["windows"] = "http://whatwhatgame.com/video/?car=eva";
+		car_config["video"]["eva"]["other"] = "http://whatwhatgame.com/video/html5/?car=eva";
+		
 		function changeCommand(command) {
 			var carServer = getCarServer();
 			document.getElementById("commandIframe").src = carServer + "/cgi?command=" + command + ".sh";
 		}
 		function getCarServer() {
-			return car_server_map[selectedCar];
+			var carId = getSelectedCar();
+			return car_config["command"][carId];
 		}
+		
 		var id_command_map = [];
 		id_command_map["forward"] = "forward";
 		id_command_map["backward"] = "backward";
@@ -259,9 +242,17 @@ body {
 			}			
 		}
 		
-		var selectedCar = "car-adam";
+		function getSelectedCar() {
+			var carId = readCookie("carId");
+			return carId || "adam";
+		}
+		
+		function setSelectedCar(carId) {
+			writeCookie("carId", carId);
+		}
+		
 		function selectCar(dom, otherId) {
-			selectedCar = dom.id;
+			carId = dom.id;
 			var otherClass = document.getElementById(otherId).className;
 			otherClass = otherClass.replace("selected","");
 			document.getElementById(otherId).className = otherClass;
@@ -269,15 +260,18 @@ body {
 			if (dom.className.indexOf("selected") == -1) {
 				dom.className = dom.className + " selected";
 			}
+			
+			setSelectedCar(carId);
+			
+			setCurrentCar(carId)
 		}
-		var videoUrl = null;
-		if (fls.f != 1) {
-			videoUrl = "http://api.whatwhatgame.com:8080/live/demo.m3u8";
-		} else {
-			videoUrl = "http://whatwhatgame.com/video/";
-		}
-		document.getElementById("video-iframe").src = videoUrl;
-		 
+		
+		function setCurrentCar(carId) {
+			document.getElementById("video-iframe").src = car_config["video"][carId][os];
+		}		
+		
+		var carId = getSelectedCar();
+		setCurrentCar(carId);
 		
 	</script>
 	
