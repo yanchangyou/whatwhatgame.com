@@ -1,0 +1,41 @@
+<script type="text/javascript" src="jwplayer.js"></script>
+<script type='text/javascript'>
+	jwplayer.key = 'N8zhkmYvvRwOhz4aTGkySoEri4x+9pQwR7GHIQ==';
+</script>
+<style>
+#player_id {
+	pointer-events: none;
+}
+* {
+	overflow: hidden;
+}
+</style>
+<div id="player_id"></div>
+
+<script>
+	
+	var _url = "rtmp://api.whatwhatgame.com:1935/whatwhatgame/first.adam";
+	
+	if (window.location.href.indexOf("eva") > -1) {
+		_url = "rtmp://api.whatwhatgame.com:1935/whatwhatgame/first.eva";
+	}
+	
+	var width = "1280";
+	var height = "768";
+	var conf = {
+		file : _url,
+		width : width,
+		height : height,
+		autostart : true,
+		analytics : {
+			enabled : false
+		},
+		controls : false,
+		events : {
+			onPause : function(event) {
+				_player.play();
+			}
+		}
+	};
+	_player = jwplayer('player_id').setup(conf);
+</script>
