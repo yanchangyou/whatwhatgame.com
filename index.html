@@ -243,6 +243,9 @@ body {
 		}
 		
 		function getSelectedCar() {
+
+                        if(1) return "eva";//adam停用
+
 			var carId = readCookie("carId");
 			return carId || "adam";
 		}
