@@ -6,14 +6,20 @@
 #player_id {
 	pointer-events: none;
 }
+#audio_id {
+	pointer-events: none;
+}
 
 * {
 	overflow: hidden;
 }
 </style>
 <div id="player_id"></div>
+<div id="audio_id"></div>
 
 <script>
+	
+	var _url_audio = "rtmp://api.whatwhatgame.com:1935/live/audio";
 	
 	var _url = "rtmp://api.whatwhatgame.com:1935/whatwhatgame/first.adam";
 	
@@ -38,6 +44,22 @@
 			}
 		}
 	};
+  var conf_audio = {
+		file : _url_audio,
+		width : width,
+		height : height,
+		autostart : true,
+		analytics : {
+			enabled : false
+		},
+		controls : false,
+		events : {
+			onPause : function(event) {
+				_player.play();
+			}
+		}
+	};
 
 	_player = jwplayer('player_id').setup(conf);
+	_audio = jwplayer('audio_id').setup(conf_audio);
 </script>
